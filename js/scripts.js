@@ -1,6 +1,6 @@
 var gamecontainer = document.querySelector(".game-container"),
     gamecells = document.querySelectorAll(".cell"),
-    maintimer = window.setInterval(tick,100),
+    maintimer = window.setInterval(tick,10),
     buttonstart = document.querySelector(".start"),
     buttonstop = document.querySelector(".stop"),
     counter = 0,
@@ -9,14 +9,30 @@ var gamecontainer = document.querySelector(".game-container"),
     posincontainer,
     shape,
     gamestarted = false,
-    firstoccurrance = true;
-
+    firstoccurrance = true,
+    changespeed = 0;
+    currentSpeed = 0;
 
 function tick() {
     counter++;
 
     if(gamestarted){
-        if (counter%2 == 0) {
+        
+        if (isLost()){
+            pauseGame() ;
+            console.log("Przegrales");
+            gamestarted = false;
+            construct = null;
+            previousconstruct = null;
+        }
+        
+        if (counter%(100-currentSpeed) == 0) {
+            changespeed++;
+            if (changespeed%10 === 0  && currentSpeed<90) {
+                currentSpeed+=2;
+            }
+
+
             if (firstoccurrance) {
                 firstoccurrance = false;
             }else{         
@@ -24,32 +40,41 @@ function tick() {
                 for (let i = 0; i < 4; i++) {
                     previousconstruct[i] = construct[i];                   
                 }
-
-                removePreviousConstruct();
+               
                 moveShape();
                 
-                if(detectCollision()){
+                if(detectCollision()){                   
                     console.log("kolizja");    
-                    console.log(previousconstruct);          
                     dockShape();
+                    checkLine();
                     construct = null;
                     previousconstruct = null;
                     firstoccurrance = true;
                     createConstruct();
+                }else{
+                    removePreviousConstruct();
                 }
             }
             showInGamecontainer(); 
         }     
     }
 }
+function isLost() {
+    for (let i = 0; i < 11; i++) {
+        if(gamecells[i].getAttribute("docked")==="true"){
+            return true;
+        }
+    }
+    return false;
+}
 
 function detectCollision() {
     var iscollision = false;
 
     construct.forEach(function(elem) {
-        if(elem >180){
+        if(elem >=180){
             iscollision = true;
-        }else if(gamecells[elem+1].getAttribute("docked")==="true"){
+        }else if(gamecells[elem].getAttribute("docked")==="true"){
             iscollision = true;
         }
         
@@ -62,15 +87,25 @@ function getRandom(min, max) {
 }
 
 function startGame() {
+    gamecells.forEach(function (elem) {
+        elem.removeAttribute("style");
+        elem.setAttribute("docked","false");
+    })
 
+    currentSpeed = 0;
+    changespeed = 0;
     firstoccurrance = true;
     gamestarted = true;
     createConstruct();
 }
 
 function pauseGame() {
-
-    gamestarted = false;
+    if (gamestarted) {
+        gamestarted = false;   
+    }else{
+        gamestarted = true;
+    }
+    
 }
 
 function createConstruct() {
@@ -89,8 +124,8 @@ function createConstruct() {
 
 function dockShape() {
     previousconstruct.forEach(function(elem){
-        gamecells[elem+1].style.background = "red";       
-        gamecells[elem+1].setAttribute("docked", "true");
+        gamecells[elem].style.background = "red";       
+        gamecells[elem].setAttribute("docked", "true");
     });    
 }
 
@@ -107,18 +142,150 @@ function moveShape() {
 function removePreviousConstruct() {
 
     previousconstruct.forEach(function(elem){
-        gamecells[elem+1].removeAttribute("style");
+        gamecells[elem].removeAttribute("style");
     });
-
 }
 
 function showInGamecontainer() {
 
     construct.forEach(function(elem) {
-        gamecells[elem+1].style.background = "red";
+        gamecells[elem].style.background = "red";
+        //gamecells[elem+1].style.transition = ".2s";
     });
 
 }
 
+function pressAKey(event) {
+    event.preventDefault();
+    
+    if (gamestarted) {   
+        
+        for (let i = 0; i < 4; i++) {
+             previousconstruct[i] = construct[i];                   
+        }
+        
+        if (event.keyCode ===37)  {  //left
+            if (canGo("left")){
+                
+                turnLeft();
+            }
+            
+        }else if(event.keyCode ===39){ //right
+            if (canGo("right")) {
+                turnRight();  
+            }          
+        }else if(event.keyCode ===40){ //down
+            turnDown();
+        }else if(event.keyCode ===38){ //up
+
+        }
+
+        if(detectCollision()){
+            console.log("kolizja");       
+            dockShape();
+            checkLine();
+            construct = null;
+            previousconstruct = null;
+            firstoccurrance = true;
+            createConstruct();
+        }else{
+            removePreviousConstruct();
+            showInGamecontainer(); 
+        }
+
+    }
+}
+
+function canGo(side) {
+
+    var left = 0,
+        right = 0;
+
+    construct.forEach(function(elem) {
+    
+        if(elem%10 === 0){
+            console.log("NIe moge w lewo")
+            left++;
+        }else if(elem.toString().substr(elem.toString().length -1, elem.toString().length)%9 === 0){
+            console.log("NIe moge w prawo")
+            right++;
+        }else if(gamecells[elem-1].getAttribute("docked")=="true"){
+            console.log("NIe moge w lewo")
+            left++;  
+        }else if(gamecells[elem+1].getAttribute("docked")=="true"){
+            console.log("NIe moge w prawo")
+            right++;  
+        }
+    });
+
+    if (side === "left" && left > 0) {
+        return false;
+    }else if(side === "right" && right > 0){
+        return false;
+    }
+
+    return true;
+}
+
+function turnLeft() {
+    if(shape === 1){
+        for (let i = 0; i < construct.length; i++) {
+            construct[i]--;         
+        }
+    } 
+
+}
+
+function turnRight() {
+    if(shape === 1){
+        for (let i = 0; i < construct.length; i++) {
+            construct[i]++;         
+        }       
+    }    
+}
+
+function turnDown() {
+    if(shape === 1){
+        for (let i = 0; i < construct.length; i++) {
+            construct[i]+=10;         
+        }       
+    }    
+}
+
+//tutaj skonczylem
+function checkLine(){
+    var toadd = 0;
+        line = 0;
+    for (let i = 0; i < 18; i++) {
+        for (let j = 0; j < 10; j++) {
+            if (gamecells[j+toadd].getAttribute("docked")==="true") {
+                line++;               
+            }
+        }
+        // console.log("line "+line);
+        if (line === 10) {
+            console.log("dziesiec")
+            rebuildTo(toadd+10);
+        }
+        line = 0;
+        toadd+=10;
+    }
+}
+
+function rebuildTo(stop) {
+    for (let i = stop-1; i >=0; i--) {
+        if (i<10) {
+            gamecells[i].removeAttribute("style");
+            gamecells[i].setAttribute("docked","false")
+        }else{
+            if ((gamecells[i-10].style).toString().length>0) {                
+                gamecells[i].style.background = gamecells[i-10].style.background ;
+            }
+            gamecells[i].setAttribute("docked",gamecells[i].getAttribute("docked"));    
+        }
+    }
+}
+
 buttonstart.addEventListener("click",startGame,false);
 buttonstop.addEventListener("click",pauseGame,false);
+window.addEventListener("keydown",pressAKey,false);
