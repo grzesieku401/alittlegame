@@ -1,0 +1,46 @@
+body{
+    font-family: 'Alice', serif;
+    background-color: azure;
+}
+
+h1{
+    font-size: 2rem;
+    padding: 20px;
+    text-align: center;
+}
+
+.container{
+    width: 1000px;
+    height: 700px;
+    margin: 0 auto;
+    position: relative;
+
+}
+
+.cell{
+    background-color: darkcyan;
+}
+
+.game-container{
+    margin: 0 auto;
+    width: 350px;
+    height: 630px;
+    background-color: cadetblue;
+    display: grid;
+    grid-template-columns: repeat(10,1fr);
+}
+
+button{
+    position: absolute;
+    width: 100px;
+    padding: 15px;
+    right: 15px;
+}
+
+.start{
+    top: 200px;
+}
+
+.stop{
+    top:270px
+}
