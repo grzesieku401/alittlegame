@@ -26,7 +26,7 @@ function tick() {
             previousconstruct = null;
         }
         
-        if (counter%(100-currentSpeed) == 0) {
+        if (counter%(300-currentSpeed) == 0) {
             changespeed++;
             if (changespeed%100 === 0  && currentSpeed<900) {
                 currentSpeed+=40;
@@ -121,8 +121,8 @@ function createConstruct() {
         construct = [3,4,5,6];
         previousconstruct = [3,4,5,6];
     }else if(shape === 3){
-        construct = [5,13,14,15];
-        previousconstruct =[5,13,14,15];
+        construct = [13,14,15,5];
+        previousconstruct = [13,14,15,5];
     }
 
 }
@@ -325,8 +325,38 @@ function transformShape() {
             }
 
         }               
-                        
+    //jesli L w prawo                    
+    }else if (shape === 3) {
+        if((construct[1]-construct[0])===1){
+            console.log("tu1");
+            construct[0] = construct[1]-10;
+            construct[2] = construct[1]+10;
+            construct[3] = construct[1]+11;
+        }else if ((construct[0]-construct[1]) === (-10)) {
+            console.log("tu2");
+            construct[0] = construct[1]+1;
+            construct[2] = construct[1]-1;
+            construct[3] = construct[1]+9;            
+        }
+        else if((construct[1]-construct[0]=== (-1))){ 
+            construct[0] = construct[1]+10;
+            construct[2] = construct[1]-10;
+            construct[3] = construct[1]-11;     
+        }
+        else if((construct[1]-construct[0]=== (-10))){
+            if ((construct[0]+1)%10!==0) {
+            console.log("tu4");
+                construct[0] = construct[1]-1;
+                construct[2] = construct[1]+1;
+                construct[3] = construct[1]-9;   
+            }    
+        }
+    //jesli L w lewo    
+    }else if (shape === 3) {
+
     }
+
+    //detekcja kolizji
     if (detectCollision()) {
         for (let i = 0; i < previousconstruct.length; i++) {
             construct[i]=previousconstruct[i];
