@@ -26,7 +26,7 @@ function tick() {
             previousconstruct = null;
         }
         
-        if (counter%(1000-currentSpeed) == 0) {
+        if (counter%(100-currentSpeed) == 0) {
             changespeed++;
             if (changespeed%100 === 0  && currentSpeed<900) {
                 currentSpeed+=40;
@@ -111,16 +111,18 @@ function pauseGame() {
 function createConstruct() {
 
     posincontainer = 4;
-    shape = getRandom(2, 1);
+    shape = getRandom(3, 1);
     
     
-    if (shape === 1){
-        
+    if (shape === 1){      
         construct = [3,4,13,14];
         previousconstruct = [3,4,13,14];
     }else if(shape === 2){
         construct = [3,4,5,6];
-        previousconstruct = [3,4,13,14];
+        previousconstruct = [3,4,5,6];
+    }else if(shape === 3){
+        construct = [5,13,14,15];
+        previousconstruct =[5,13,14,15];
     }
 
 }
@@ -131,7 +133,10 @@ function dockShape() {
             gamecells[elem].style.background = "red";
         }else if (shape === 2) {
             gamecells[elem].style.background = "green"; 
-        }      
+        }else if (shape == 3){
+            gamecells[elem].style.background = "blue";    
+        }
+        //gamecells[elem].style.border = "solid 1px gray";
         gamecells[elem].setAttribute("docked", "true");
     });    
 }
@@ -159,8 +164,10 @@ function showInGamecontainer() {
             gamecells[elem].style.background = "red";
         }else if (shape === 2) {
             gamecells[elem].style.background = "green"; 
+        } if (shape === 3) {
+            gamecells[elem].style.background = "blue"; 
         }
-        
+        //gamecells[elem].style.border = "solid 1px gray";
         console.log(gamecells[elem].style.length);
         if(gamecells[elem].hasAttribute("style") && gamecells[elem].style.length===0){
             gamecells[elem].removeAttribute("style");
@@ -190,7 +197,7 @@ function pressAKey(event) {
         }else if(event.keyCode ===40){ //down
             turnDown();
         }else if(event.keyCode ===38){ //up
-
+            transformShape();
         }
 
         if(detectCollision()){
@@ -258,7 +265,6 @@ function turnDown() {
     }           
 }
 
-//tutaj skonczylem
 function checkLine(){
     var toadd = 0;
         line = 0;
@@ -291,6 +297,39 @@ function rebuildTo(stop) {
                 gamecells[i].style.background = gamecells[i-10].style.background; 
             }
             gamecells[i].setAttribute("docked",gamecells[i-10].getAttribute("docked"));    
+        }
+    }
+}
+
+function transformShape() {
+    //jesli kwadrat
+    if (shape === 1) {
+    
+    //jesli linia
+    }else if (shape === 2) {
+        //jesli poziomo
+        if(construct[1]-construct[0]===1){
+            if (construct[1]>10 && !gamecells[construct[1]+20].hasAttribute("style")) {
+                construct[0] = construct[1] - 10;
+                construct[2] = construct[1] + 10;
+                construct[3] = construct[1] + 20;
+            }
+        //jesli pionowo    
+        }else{
+            if(construct[1]%10!==0){
+                if ((construct[0]+2)%10!==0 && (construct[0]+1)%10!==0) {
+                    construct[0] = construct[1] - 1;
+                    construct[2] = construct[1] + 1;
+                    construct[3] = construct[1] + 2;                    
+                }
+            }
+
+        }               
+                        
+    }
+    if (detectCollision()) {
+        for (let i = 0; i < previousconstruct.length; i++) {
+            construct[i]=previousconstruct[i];
         }
     }
 }
