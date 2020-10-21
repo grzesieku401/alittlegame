@@ -1,6 +1,6 @@
 var gamecontainer = document.querySelector(".game-container"),
     gamecells = document.querySelectorAll(".cell"),
-    maintimer = window.setInterval(tick,10),
+    maintimer = window.setInterval(tick,1),
     buttonstart = document.querySelector(".start"),
     buttonstop = document.querySelector(".stop"),
     counter = 0,
@@ -26,10 +26,10 @@ function tick() {
             previousconstruct = null;
         }
         
-        if (counter%(100-currentSpeed) == 0) {
+        if (counter%(1000-currentSpeed) == 0) {
             changespeed++;
-            if (changespeed%10 === 0  && currentSpeed<90) {
-                currentSpeed+=2;
+            if (changespeed%100 === 0  && currentSpeed<900) {
+                currentSpeed+=40;
             }
 
 
@@ -111,7 +111,7 @@ function pauseGame() {
 function createConstruct() {
 
     posincontainer = 4;
-    //shape = getRandom(7, 1);
+    //shape = getRandom(2, 1);
     shape = 1;
     
     if (shape === 1){
@@ -140,9 +140,11 @@ function moveShape() {
 
 
 function removePreviousConstruct() {
-
+    var counter = 0;
     previousconstruct.forEach(function(elem){
         gamecells[elem].removeAttribute("style");
+        counter++;
+        //console.log(counter);
     });
 }
 
@@ -150,6 +152,10 @@ function showInGamecontainer() {
 
     construct.forEach(function(elem) {
         gamecells[elem].style.background = "red";
+        console.log(gamecells[elem].style.length);
+        if(gamecells[elem].hasAttribute("style") && gamecells[elem].style.length===0){
+            gamecells[elem].removeAttribute("style");
+        }
         //gamecells[elem+1].style.transition = ".2s";
     });
 
@@ -165,11 +171,9 @@ function pressAKey(event) {
         }
         
         if (event.keyCode ===37)  {  //left
-            if (canGo("left")){
-                
+            if (canGo("left")){ 
                 turnLeft();
-            }
-            
+            }      
         }else if(event.keyCode ===39){ //right
             if (canGo("right")) {
                 turnRight();  
@@ -233,7 +237,6 @@ function turnLeft() {
             construct[i]--;         
         }
     } 
-
 }
 
 function turnRight() {
@@ -278,10 +281,11 @@ function rebuildTo(stop) {
             gamecells[i].removeAttribute("style");
             gamecells[i].setAttribute("docked","false")
         }else{
-            if ((gamecells[i-10].style).toString().length>0) {                
-                gamecells[i].style.background = gamecells[i-10].style.background ;
+
+            if (!gamecells[i-10].hasAttribute("style")) {                 
+                gamecells[i].removeAttribute("style");
             }
-            gamecells[i].setAttribute("docked",gamecells[i].getAttribute("docked"));    
+            gamecells[i].setAttribute("docked",gamecells[i-10].getAttribute("docked"));    
         }
     }
 }
