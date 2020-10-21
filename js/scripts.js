@@ -111,12 +111,15 @@ function pauseGame() {
 function createConstruct() {
 
     posincontainer = 4;
-    //shape = getRandom(2, 1);
-    shape = 1;
+    shape = getRandom(2, 1);
+    
     
     if (shape === 1){
         
         construct = [3,4,13,14];
+        previousconstruct = [3,4,13,14];
+    }else if(shape === 2){
+        construct = [3,4,5,6];
         previousconstruct = [3,4,13,14];
     }
 
@@ -124,17 +127,18 @@ function createConstruct() {
 
 function dockShape() {
     previousconstruct.forEach(function(elem){
-        gamecells[elem].style.background = "red";       
+        if(shape === 1){
+            gamecells[elem].style.background = "red";
+        }else if (shape === 2) {
+            gamecells[elem].style.background = "green"; 
+        }      
         gamecells[elem].setAttribute("docked", "true");
     });    
 }
 
 function moveShape() {
-
-    if (shape === 1) {
-        for (let i = 0; i < construct.length; i++) {
-            construct[i]+=10;
-        }
+    for (let i = 0; i < construct.length; i++) {
+        construct[i]+=10;
     }
 }
 
@@ -151,7 +155,12 @@ function removePreviousConstruct() {
 function showInGamecontainer() {
 
     construct.forEach(function(elem) {
-        gamecells[elem].style.background = "red";
+        if(shape === 1){
+            gamecells[elem].style.background = "red";
+        }else if (shape === 2) {
+            gamecells[elem].style.background = "green"; 
+        }
+        
         console.log(gamecells[elem].style.length);
         if(gamecells[elem].hasAttribute("style") && gamecells[elem].style.length===0){
             gamecells[elem].removeAttribute("style");
@@ -232,27 +241,21 @@ function canGo(side) {
 }
 
 function turnLeft() {
-    if(shape === 1){
-        for (let i = 0; i < construct.length; i++) {
-            construct[i]--;         
-        }
-    } 
+    for (let i = 0; i < construct.length; i++) {
+        construct[i]--;         
+    }
 }
 
 function turnRight() {
-    if(shape === 1){
-        for (let i = 0; i < construct.length; i++) {
-            construct[i]++;         
-        }       
-    }    
+    for (let i = 0; i < construct.length; i++) {
+        construct[i]++;         
+    }           
 }
 
 function turnDown() {
-    if(shape === 1){
-        for (let i = 0; i < construct.length; i++) {
-            construct[i]+=10;         
-        }       
-    }    
+    for (let i = 0; i < construct.length; i++) {
+        construct[i]+=10;         
+    }           
 }
 
 //tutaj skonczylem
@@ -284,6 +287,8 @@ function rebuildTo(stop) {
 
             if (!gamecells[i-10].hasAttribute("style")) {                 
                 gamecells[i].removeAttribute("style");
+            }else{
+                gamecells[i].style.background = gamecells[i-10].style.background; 
             }
             gamecells[i].setAttribute("docked",gamecells[i-10].getAttribute("docked"));    
         }
