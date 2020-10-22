@@ -44,7 +44,7 @@ function tick() {
                 moveShape();
                 
                 if(detectCollision()){                   
-                    console.log("kolizja");    
+                    //console.log("kolizja");    
                     dockShape();
                     checkLine();
                     construct = null;
@@ -111,7 +111,7 @@ function pauseGame() {
 function createConstruct() {
 
     posincontainer = 4;
-    shape = getRandom(3, 1);
+    shape = getRandom(7, 1);
     
     
     if (shape === 1){      
@@ -123,6 +123,18 @@ function createConstruct() {
     }else if(shape === 3){
         construct = [13,14,15,5];
         previousconstruct = [13,14,15,5];
+    }else if(shape === 4){
+        construct = [15,14,13,3];
+        previousconstruct =  [15,14,13,3];
+    }if(shape === 5){
+        construct = [14,15,5,6];
+        previousconstruct =  [14,15,5,6];
+    }if(shape === 6){
+        construct = [15,14,3,4];
+        previousconstruct = [15,14,3,4];
+    }if(shape === 7){
+        construct = [4,14,13,15];
+        previousconstruct = [4,14,13,15];
     }
 
 }
@@ -135,6 +147,14 @@ function dockShape() {
             gamecells[elem].style.background = "green"; 
         }else if (shape == 3){
             gamecells[elem].style.background = "blue";    
+        }else if (shape == 4){
+            gamecells[elem].style.background = "yellow";    
+        }else if (shape == 5){
+            gamecells[elem].style.background = "orange";    
+        }else if (shape == 6){
+            gamecells[elem].style.background = "#9C27B0";    
+        }if (shape == 7){
+            gamecells[elem].style.background = "#795548";    
         }
         //gamecells[elem].style.border = "solid 1px gray";
         gamecells[elem].setAttribute("docked", "true");
@@ -149,11 +169,8 @@ function moveShape() {
 
 
 function removePreviousConstruct() {
-    var counter = 0;
     previousconstruct.forEach(function(elem){
         gamecells[elem].removeAttribute("style");
-        counter++;
-        //console.log(counter);
     });
 }
 
@@ -166,9 +183,17 @@ function showInGamecontainer() {
             gamecells[elem].style.background = "green"; 
         } if (shape === 3) {
             gamecells[elem].style.background = "blue"; 
+        }if (shape === 4) {
+            gamecells[elem].style.background = "yellow"; 
+        }else if (shape == 5){
+            gamecells[elem].style.background = "orange";    
+        }else if (shape == 6){
+            gamecells[elem].style.background = "#9C27B0";    
+        }if (shape == 7){
+            gamecells[elem].style.background = "#795548";    
         }
         //gamecells[elem].style.border = "solid 1px gray";
-        console.log(gamecells[elem].style.length);
+
         if(gamecells[elem].hasAttribute("style") && gamecells[elem].style.length===0){
             gamecells[elem].removeAttribute("style");
         }
@@ -178,6 +203,7 @@ function showInGamecontainer() {
 }
 
 function pressAKey(event) {
+    //console.log(counter + "Przed");
     event.preventDefault();
     
     if (gamestarted) {   
@@ -194,14 +220,14 @@ function pressAKey(event) {
             if (canGo("right")) {
                 turnRight();  
             }          
-        }else if(event.keyCode ===40){ //down
+        }else if(event.keyCode ===40){ //down         
             turnDown();
         }else if(event.keyCode ===38){ //up
             transformShape();
         }
 
         if(detectCollision()){
-            console.log("kolizja");       
+            //console.log("kolizja");       
             dockShape();
             checkLine();
             construct = null;
@@ -212,7 +238,7 @@ function pressAKey(event) {
             removePreviousConstruct();
             showInGamecontainer(); 
         }
-
+        //console.log(counter + "Po");
     }
 }
 
@@ -224,16 +250,16 @@ function canGo(side) {
     construct.forEach(function(elem) {
     
         if(elem%10 === 0){
-            console.log("NIe moge w lewo")
+            //console.log("NIe moge w lewo")
             left++;
         }else if(elem.toString().substr(elem.toString().length -1, elem.toString().length)%9 === 0){
-            console.log("NIe moge w prawo")
+            //console.log("NIe moge w prawo")
             right++;
         }else if(gamecells[elem-1].getAttribute("docked")=="true"){
-            console.log("NIe moge w lewo")
+            //console.log("NIe moge w lewo")
             left++;  
         }else if(gamecells[elem+1].getAttribute("docked")=="true"){
-            console.log("NIe moge w prawo")
+            //console.log("NIe moge w prawo")
             right++;  
         }
     });
@@ -276,7 +302,7 @@ function checkLine(){
         }
         // console.log("line "+line);
         if (line === 10) {
-            console.log("dziesiec")
+            //console.log("dziesiec")
             rebuildTo(toadd+10);
         }
         line = 0;
@@ -303,6 +329,7 @@ function rebuildTo(stop) {
 
 function transformShape() {
     //jesli kwadrat
+    //console.log(construct);
     if (shape === 1) {
     
     //jesli linia
@@ -328,31 +355,121 @@ function transformShape() {
     //jesli L w prawo                    
     }else if (shape === 3) {
         if((construct[1]-construct[0])===1){
-            console.log("tu1");
+            //console.log("tu1");
             construct[0] = construct[1]-10;
             construct[2] = construct[1]+10;
             construct[3] = construct[1]+11;
         }else if ((construct[0]-construct[1]) === (-10)) {
-            console.log("tu2");
+            //console.log("tu2");
             construct[0] = construct[1]+1;
             construct[2] = construct[1]-1;
             construct[3] = construct[1]+9;            
         }
         else if((construct[1]-construct[0]=== (-1))){ 
+            //console.log("tu3");
             construct[0] = construct[1]+10;
             construct[2] = construct[1]-10;
             construct[3] = construct[1]-11;     
         }
         else if((construct[1]-construct[0]=== (-10))){
             if ((construct[0]+1)%10!==0) {
-            console.log("tu4");
+            //console.log("tu4");
                 construct[0] = construct[1]-1;
                 construct[2] = construct[1]+1;
                 construct[3] = construct[1]-9;   
             }    
         }
-    //jesli L w lewo    
-    }else if (shape === 3) {
+    //jesli L w lewo   construct = [15,14,13,3]; 
+    }else if (shape === 4) {
+        if((construct[1]-construct[0])=== -1 ){
+            //console.log("tu1");
+            construct[0] = construct[1]+10;
+            construct[2] = construct[1]-10;
+            construct[3] = construct[1]-9;
+        }else if ((construct[0]-construct[1]) === 10) {
+            
+            //console.log("tu2");
+            if ((construct[0])%10!==0) {
+                construct[0] = construct[1]-1;
+                construct[2] = construct[1]+1;
+                construct[3] = construct[1]+11;      
+            }
+        }
+        else if((construct[1]-construct[0]=== 1)){ 
+            //console.log("tu3");
+            construct[0] = construct[1]-10;
+            construct[2] = construct[1]+10;
+            construct[3] = construct[1]+9;  
+        }
+        else if((construct[1]-construct[0]=== (10))){
+            //console.log("tu4");
+            if ((construct[0]+1)%10!==0) {
+                construct[0] = construct[1]+1;
+                construct[2] = construct[1]-1;
+                construct[3] = construct[1]-11;   
+            }         
+        }
+    //jesli Z w prawo   
+    }else if (shape === 5) {
+        if((construct[1]-construct[0])=== 1 ){
+            construct[0] = construct[1]-10;
+            construct[2] = construct[1]+1;
+            construct[3] = construct[1]+11;  
+        }else{
+            if ((construct[0])%10!==0) {
+                construct[0] = construct[1]-1;
+                construct[2] = construct[1]-10;
+                construct[3] = construct[1]-9;  
+            }
+        }
+
+    }
+    //jesli Z w lewo construct = [14,15,3,4];
+    else if (shape === 6) {
+        
+        if((construct[1]-construct[0]) === -1 ){
+            //console.log("tu1");
+            construct[1]++;
+            construct[0] = construct[1]-10;
+            construct[2] = construct[1]-1;
+            construct[3] = construct[1]+9;  
+        }else{
+            //console.log("tu2");
+            if ((construct[1]-1)%10!==0) {
+                construct[1]--;
+                construct[0] = construct[1]+1;
+                construct[2] = construct[1]-10;
+                construct[3] = construct[1]-11;  
+            }
+        }
+    //jesli niepelny krzyzyk   [4,14,13,15];
+    }else if (shape === 7) {
+        
+        if((construct[1]-construct[0]) === 10 ){
+            //console.log("tu1");
+            construct[0] = construct[1]+1;
+            construct[2] = construct[1]-10;
+            construct[3] = construct[1]+10;  
+        }
+        else if ((construct[1]-construct[0]) === -1)  {
+            if ((construct[1])%10!==0) {
+                construct[0] = construct[1]+10;
+                construct[2] = construct[1]+1;
+                construct[3] = construct[1]-1;     
+            }     
+        }
+        else if ((construct[1]-construct[0]) === -10)  {
+            construct[0] = construct[1]-1;
+            construct[2] = construct[1]+10;
+            construct[3] = construct[1]-10;      
+        }
+        else if ((construct[1]-construct[0]) === 1)  {
+            if ((construct[1]+1)%10!==0) {
+                construct[0] = construct[1]-10;
+                construct[2] = construct[1]-1;
+                construct[3] = construct[1]+1;   
+            }       
+        }
 
     }
 
