@@ -7,6 +7,7 @@ h1{
     font-size: 2rem;
     padding: 20px;
     text-align: center;
+    color: #424242;
 }
 
 .container{
@@ -15,10 +16,6 @@ h1{
     margin: 0 auto;
     position: relative;
 
-}
-
-.cell{
-    background-color: darkcyan;
 }
 
 .game-container{
@@ -30,17 +27,32 @@ h1{
     grid-template-columns: repeat(10,1fr);
 }
 
-button{
+button,h2,.score{
     position: absolute;
     width: 100px;
     padding: 15px;
-    right: 15px;
+    right: 100px;
 }
 
 .start{
-    top: 200px;
+    top: 400px;
 }
 
 .stop{
-    top:270px
+    top:470px
+}
+
+h2{
+    color: #424242;
+    font-size: 2rem;
+    top: 220px;
+    right: 90px;
+}
+
+.score{
+    right: 90px;
+    padding: 10px;
+    top: 290px;
+    background-color: #FFE082;
+    font-size: 1.8rem;
 }

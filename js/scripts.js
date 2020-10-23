@@ -1,17 +1,17 @@
 var gamecontainer = document.querySelector(".game-container"),
-    gamecells = document.querySelectorAll(".cell"),
-    maintimer = window.setInterval(tick,1),
+    gamecells,
+    maintimer,
     buttonstart = document.querySelector(".start"),
     buttonstop = document.querySelector(".stop"),
+    score = document.querySelector(".score"),
     counter = 0,
     construct,
     previousconstruct,
-    posincontainer,
     shape,
     gamestarted = false,
     firstoccurrance = true,
-    changespeed = 0;
-    currentSpeed = 0;
+    changespeed = 1;
+    currentSpeed = 100;
 
 function tick() {
     counter++;
@@ -26,11 +26,9 @@ function tick() {
             previousconstruct = null;
         }
         
-        if (counter%(300-currentSpeed) == 0) {
-            changespeed++;
-            if (changespeed%100 === 0  && currentSpeed<900) {
-                currentSpeed+=40;
-            }
+        if (counter%(currentSpeed) === 0) {
+            //score.textContent= parseInt(score.textContent)+300;     
+
 
 
             if (firstoccurrance) {
@@ -92,8 +90,9 @@ function startGame() {
         elem.setAttribute("docked","false");
     })
 
-    currentSpeed = 0;
-    changespeed = 0;
+    currentSpeed = 1500;
+    changespeed = 1;
+    score.textContent = 0;
     firstoccurrance = true;
     gamestarted = true;
     createConstruct();
@@ -110,9 +109,7 @@ function pauseGame() {
 
 function createConstruct() {
 
-    posincontainer = 4;
     shape = getRandom(7, 1);
-    
     
     if (shape === 1){      
         construct = [3,4,13,14];
@@ -203,8 +200,9 @@ function showInGamecontainer() {
 }
 
 function pressAKey(event) {
-    //console.log(counter + "Przed");
+
     event.preventDefault();
+    console.log(event.key);
     
     if (gamestarted) {   
         
@@ -292,8 +290,9 @@ function turnDown() {
 }
 
 function checkLine(){
-    var toadd = 0;
-        line = 0;
+    var toadd = 0,
+        line = 0,
+        howmanylines = 0;
     for (let i = 0; i < 18; i++) {
         for (let j = 0; j < 10; j++) {
             if (gamecells[j+toadd].getAttribute("docked")==="true") {
@@ -302,12 +301,30 @@ function checkLine(){
         }
         // console.log("line "+line);
         if (line === 10) {
+            howmanylines++;
             //console.log("dziesiec")
             rebuildTo(toadd+10);
         }
         line = 0;
         toadd+=10;
     }
+    if (howmanylines ===1) {
+        score.textContent= parseInt(score.textContent)+40;   
+    }else if (howmanylines ===2) {
+        score.textContent= parseInt(score.textContent)+100;   
+    }else if (howmanylines ===3) {
+        score.textContent= parseInt(score.textContent)+180;   
+    }else if (howmanylines ===4) {
+        score.textContent= parseInt(score.textContent)+300;      
+    }
+    setCurrentSpeed();
+}
+
+function setCurrentSpeed(){
+    if(parseInt(score.textContent) >= (100*changespeed + (currentSpeed*changespeed))){
+        currentSpeed-=5;
+        changespeed++;
+    }    
 }
 
 function rebuildTo(stop) {
@@ -481,6 +498,24 @@ function transformShape() {
     }
 }
 
+function createBlocks() {
+    
+    var df = document.createDocumentFragment();
+
+    for (let i = 0; i < 180; i++) {
+        var newCell = document.createElement("div");
+        newCell.setAttribute("docked","false");
+        newCell.classList.add("cell");
+        df.appendChild(newCell);
+    }
+    gamecontainer.appendChild(df);
+    gamecells= document.querySelectorAll(".cell")
+  
+}
+
+createBlocks();
+maintimer = window.setInterval(tick,5);
 buttonstart.addEventListener("click",startGame,false);
 buttonstop.addEventListener("click",pauseGame,false);
-window.addEventListener("keydown",pressAKey,false);
+//window.addEventListener("keydown",pressAKey,false);
+window.addEventListener("keypress",pressAKey,false);
