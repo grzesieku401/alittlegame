@@ -1,13 +1,13 @@
 body{
     font-family: 'Alice', serif;
     background-color: azure;
+    color: #37474F;
 }
 
 h1{
     font-size: 2rem;
     padding: 20px;
     text-align: center;
-    color: #424242;
 }
 
 .container{
@@ -22,37 +22,58 @@ h1{
     margin: 0 auto;
     width: 350px;
     height: 630px;
-    background-color: cadetblue;
+    background-color: #B0BEC5;
     display: grid;
-    grid-template-columns: repeat(10,1fr);
+    grid-template-columns: repeat(10,35px);
+    grid-template-rows: repeat(18,35px);
+    border: 1px solid rgb(170, 170, 170);
 }
 
 button,h2,.score{
-    position: absolute;
-    width: 100px;
+
     padding: 15px;
-    right: 100px;
-}
-
-.start{
-    top: 400px;
-}
-
-.stop{
-    top:470px
 }
 
 h2{
-    color: #424242;
     font-size: 2rem;
-    top: 220px;
-    right: 90px;
 }
 
 .score{
-    right: 90px;
     padding: 10px;
-    top: 290px;
     background-color: #FFE082;
     font-size: 1.8rem;
+}
+
+.next-shape{
+
+    width:140px;
+    height: 140px;
+    display: grid;
+    grid-template-columns: repeat(4,35px);
+    grid-template-rows: repeat(4,35px);
+}
+
+.next-shape-text{
+    right: 110px;   
+    font-size: 1.8rem; 
+}
+
+button{
+    border: none;
+    font-size: 1.5rem;
+    background-color: #BDBDBD;
+    color: #37474F;
+}
+
+.game-control{
+
+    position: absolute;
+    top: 0px;
+    right: 150px;
+    height: 630px;
+    display: grid;
+    grid-template-rows: repeat(8,1fr);
+    align-items: center;
+    justify-content: center;
+
 }

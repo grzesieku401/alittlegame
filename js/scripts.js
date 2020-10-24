@@ -1,5 +1,7 @@
 var gamecontainer = document.querySelector(".game-container"),
+    helpcontainer = document.querySelector(".next-shape"),
     gamecells,
+    helpcells,
     maintimer,
     buttonstart = document.querySelector(".start"),
     buttonstop = document.querySelector(".stop"),
@@ -8,13 +10,19 @@ var gamecontainer = document.querySelector(".game-container"),
     construct,
     previousconstruct,
     shape,
+    nextshape,
     gamestarted = false,
     firstoccurrance = true,
-    changespeed = 1;
-    currentSpeed = 100;
+    changespeed = 1,
+    currentSpeed,
+    key = null;
 
 function tick() {
+    console.log()
     counter++;
+    if (counter >10000) {
+        counter = 0;  
+    }
 
     if(gamestarted){
         
@@ -25,11 +33,53 @@ function tick() {
             construct = null;
             previousconstruct = null;
         }
+
+        if (key !==null) {
+            for (let i = 0; i < 4; i++) {
+                previousconstruct[i] = construct[i];                   
+            }
+            if (key ===37)  {  //left
+                if(counter%4===0){
+                    if (canGo("left")){                    
+                        turnLeft();                                          
+                    }   
+                }   
+            }
+             if(key ===39){ //right   
+                if(counter%4===0){
+                    if (canGo("right")) {                    
+                        turnRight();      
+                    } 
+                }         
+            } 
+            if(key ===40){ //down   
+                if(counter%4===0){
+                    if (canGo("down")) {                    
+                        turnDown();     
+                    } 
+                }                                            
+            }       
+            if(key===38){ //up
+                transformShape();
+                key =null;
+            }
+
+            if(detectCollision()){   
+                dockShape();
+                checkLine();
+                construct = null;
+                previousconstruct = null;
+                firstoccurrance = true;
+                createConstruct();
+            }else{
+                
+                removePreviousConstruct();
+                showInGamecontainer(); 
+            }
+
+        }
         
         if (counter%(currentSpeed) === 0) {
-            //score.textContent= parseInt(score.textContent)+300;     
-
-
 
             if (firstoccurrance) {
                 firstoccurrance = false;
@@ -42,7 +92,7 @@ function tick() {
                 moveShape();
                 
                 if(detectCollision()){                   
-                    //console.log("kolizja");    
+                    console.log("kolizja");    
                     dockShape();
                     checkLine();
                     construct = null;
@@ -90,7 +140,7 @@ function startGame() {
         elem.setAttribute("docked","false");
     })
 
-    currentSpeed = 1500;
+    currentSpeed = 120;
     changespeed = 1;
     score.textContent = 0;
     firstoccurrance = true;
@@ -107,47 +157,120 @@ function pauseGame() {
     
 }
 
+function createHelpConstruct() {
+    
+    var helpconstruct = [];
+
+    if (nextshape === 1){      
+        helpconstruct = [4,5,8,9];
+
+    }else if(nextshape === 2){
+        helpconstruct = [8,9,10,11];
+
+    }else if(nextshape === 3){
+        helpconstruct = [8,9,10,6];
+
+    }else if(nextshape === 4){
+        helpconstruct = [8,9,10,4];
+
+    }if(nextshape === 5){
+        helpconstruct = [8,9,5,6];
+
+    }if(nextshape === 6){
+        helpconstruct = [4,5,9,10];
+
+    }if(nextshape === 7){
+        helpconstruct = [5,8,9,10];
+    }
+
+    for (let i = 0; i < helpcells.length; i++) {
+        helpcells[i].removeAttribute("style");
+    }
+
+    helpconstruct.forEach(function (elem) {
+        if(nextshape === 1){
+            helpcells[elem].style.background = "#EF5350";
+        }else if (nextshape === 2) {
+            helpcells[elem].style.background = "#2E7D32"; 
+        }else if (nextshape == 3){
+            helpcells[elem].style.background = "#0277BD";    
+        }else if (nextshape == 4){
+            helpcells[elem].style.background = "#FFFF00";    
+        }else if (nextshape == 5){
+            helpcells[elem].style.background = "#F9A825";    
+        }else if (nextshape == 6){
+            helpcells[elem].style.background = "#9C27B0";    
+        }if (nextshape == 7){
+            helpcells[elem].style.background = "#795548";    
+        }
+        helpcells[elem].style.border= "1px solid #9E9E9E"
+    });
+}
+
 function createConstruct() {
 
-    shape = getRandom(7, 1);
+    if (nextshape == null) {
+        shape = getRandom(7, 1);
+    }else{
+        shape = nextshape;  
+    }
+    
+    nextshape = getRandom(7, 1);
     
     if (shape === 1){      
         construct = [3,4,13,14];
-        previousconstruct = [3,4,13,14];
+        previousconstruct = [3,4,3,4];
     }else if(shape === 2){
         construct = [3,4,5,6];
-        previousconstruct = [3,4,5,6];
+        previousconstruct = [3,4,3,4];
     }else if(shape === 3){
         construct = [13,14,15,5];
-        previousconstruct = [13,14,15,5];
+        previousconstruct = [3,4,5,5];
     }else if(shape === 4){
         construct = [15,14,13,3];
-        previousconstruct =  [15,14,13,3];
+        previousconstruct =  [5,4,3,3];
     }if(shape === 5){
         construct = [14,15,5,6];
-        previousconstruct =  [14,15,5,6];
+        previousconstruct =  [4,5,4,5];
     }if(shape === 6){
         construct = [15,14,3,4];
-        previousconstruct = [15,14,3,4];
+        previousconstruct = [5,4,5,4];
     }if(shape === 7){
         construct = [4,14,13,15];
-        previousconstruct = [4,14,13,15];
+        previousconstruct = [4,3,4,5];
     }
 
+    createHelpConstruct();
+
+    var isthere = 0;
+
+    for (let i = 3; i < 7; i++) {
+        if (gamecells[i].getAttribute("docked")==="true") {
+            isthere++;
+        }
+    }
+    if (isthere > 0) {
+        gamestarted = false;
+        console.log("Przegrales");       
+    }else if(detectCollision()){   
+        dockShape();
+        gamestarted = false;
+        console.log("Przegrales");
+    }
 }
 
 function dockShape() {
     previousconstruct.forEach(function(elem){
         if(shape === 1){
-            gamecells[elem].style.background = "red";
+            gamecells[elem].style.background = "#EF5350";
         }else if (shape === 2) {
-            gamecells[elem].style.background = "green"; 
+            gamecells[elem].style.background = "#2E7D32"; 
         }else if (shape == 3){
-            gamecells[elem].style.background = "blue";    
+            gamecells[elem].style.background = "#0277BD";    
         }else if (shape == 4){
-            gamecells[elem].style.background = "yellow";    
+            gamecells[elem].style.background = "#FFFF00";    
         }else if (shape == 5){
-            gamecells[elem].style.background = "orange";    
+            gamecells[elem].style.background = "#F9A825";    
         }else if (shape == 6){
             gamecells[elem].style.background = "#9C27B0";    
         }if (shape == 7){
@@ -156,6 +279,7 @@ function dockShape() {
         //gamecells[elem].style.border = "solid 1px gray";
         gamecells[elem].setAttribute("docked", "true");
     });    
+    shape =null;
 }
 
 function moveShape() {
@@ -175,20 +299,21 @@ function showInGamecontainer() {
 
     construct.forEach(function(elem) {
         if(shape === 1){
-            gamecells[elem].style.background = "red";
+            gamecells[elem].style.background = "#EF5350";
         }else if (shape === 2) {
-            gamecells[elem].style.background = "green"; 
-        } if (shape === 3) {
-            gamecells[elem].style.background = "blue"; 
-        }if (shape === 4) {
-            gamecells[elem].style.background = "yellow"; 
+            gamecells[elem].style.background = "#2E7D32"; 
+        }else if (shape == 3){
+            gamecells[elem].style.background = "#0277BD";    
+        }else if (shape == 4){
+            gamecells[elem].style.background = "#FFFF00";    
         }else if (shape == 5){
-            gamecells[elem].style.background = "orange";    
+            gamecells[elem].style.background = "#F9A825";    
         }else if (shape == 6){
             gamecells[elem].style.background = "#9C27B0";    
         }if (shape == 7){
             gamecells[elem].style.background = "#795548";    
         }
+        gamecells[elem].style.border= "1px solid #9E9E9E"
         //gamecells[elem].style.border = "solid 1px gray";
 
         if(gamecells[elem].hasAttribute("style") && gamecells[elem].style.length===0){
@@ -201,43 +326,22 @@ function showInGamecontainer() {
 
 function pressAKey(event) {
 
-    event.preventDefault();
-    console.log(event.key);
-    
-    if (gamestarted) {   
-        
-        for (let i = 0; i < 4; i++) {
-             previousconstruct[i] = construct[i];                   
-        }
-        
-        if (event.keyCode ===37)  {  //left
-            if (canGo("left")){ 
-                turnLeft();
-            }      
-        }else if(event.keyCode ===39){ //right
-            if (canGo("right")) {
-                turnRight();  
-            }          
-        }else if(event.keyCode ===40){ //down         
-            turnDown();
-        }else if(event.keyCode ===38){ //up
-            transformShape();
-        }
+        event.preventDefault();
 
-        if(detectCollision()){
-            //console.log("kolizja");       
-            dockShape();
-            checkLine();
-            construct = null;
-            previousconstruct = null;
-            firstoccurrance = true;
-            createConstruct();
-        }else{
-            removePreviousConstruct();
-            showInGamecontainer(); 
+        if (event.keyCode ===37)  {  //left
+            key =37;
+        }else if(event.keyCode ===39){ //right
+            key =39
+        }else if(event.keyCode ===40){ //down         
+            key =40
+        }else if(event.keyCode ===38){ //up
+            key =38
         }
-        //console.log(counter + "Po");
-    }
+}
+
+function releaseAKey() {
+    event.preventDefault();
+    key= null;   
 }
 
 function canGo(side) {
@@ -313,18 +417,19 @@ function checkLine(){
     }else if (howmanylines ===2) {
         score.textContent= parseInt(score.textContent)+100;   
     }else if (howmanylines ===3) {
-        score.textContent= parseInt(score.textContent)+180;   
+        score.textContent= parseInt(score.textContent)+140;   
     }else if (howmanylines ===4) {
-        score.textContent= parseInt(score.textContent)+300;      
+        score.textContent= parseInt(score.textContent)+220;      
     }
     setCurrentSpeed();
 }
 
 function setCurrentSpeed(){
-    if(parseInt(score.textContent) >= (100*changespeed + (currentSpeed*changespeed))){
-        currentSpeed-=5;
+    if(parseInt(score.textContent) >= (230*changespeed /*+ (currentSpeed*changespeed)*/)){
+        currentSpeed-=10;
         changespeed++;
-    }    
+    }   
+  
 }
 
 function rebuildTo(stop) {
@@ -371,16 +476,19 @@ function transformShape() {
         }               
     //jesli L w prawo                    
     }else if (shape === 3) {
+
         if((construct[1]-construct[0])===1){
             //console.log("tu1");
             construct[0] = construct[1]-10;
             construct[2] = construct[1]+10;
             construct[3] = construct[1]+11;
         }else if ((construct[0]-construct[1]) === (-10)) {
+            if ((construct[0])%10!==0) {
             //console.log("tu2");
-            construct[0] = construct[1]+1;
-            construct[2] = construct[1]-1;
-            construct[3] = construct[1]+9;            
+                construct[0] = construct[1]+1;
+                construct[2] = construct[1]-1;
+                construct[3] = construct[1]+9;  
+            }          
         }
         else if((construct[1]-construct[0]=== (-1))){ 
             //console.log("tu3");
@@ -390,7 +498,7 @@ function transformShape() {
         }
         else if((construct[1]-construct[0]=== (-10))){
             if ((construct[0]+1)%10!==0) {
-            //console.log("tu4");
+                //console.log("tu4");
                 construct[0] = construct[1]-1;
                 construct[2] = construct[1]+1;
                 construct[3] = construct[1]-9;   
@@ -513,9 +621,24 @@ function createBlocks() {
   
 }
 
+function createHelpBlocks() {
+    
+    var df = document.createDocumentFragment();
+
+    for (let i = 0; i < 16; i++) {
+        var newCell = document.createElement("div");
+        df.appendChild(newCell);
+    }
+    helpcontainer.appendChild(df);
+    helpcells= document.querySelectorAll(".next-shape div")
+  
+}
+
 createBlocks();
-maintimer = window.setInterval(tick,5);
+createHelpBlocks();
+maintimer = window.setInterval(tick,10);
 buttonstart.addEventListener("click",startGame,false);
 buttonstop.addEventListener("click",pauseGame,false);
-//window.addEventListener("keydown",pressAKey,false);
-window.addEventListener("keypress",pressAKey,false);
+window.addEventListener("keydown",pressAKey,false);
+window.addEventListener("keyup",releaseAKey,false);
+
